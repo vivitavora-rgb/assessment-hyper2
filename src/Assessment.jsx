@@ -795,25 +795,27 @@ async function enviarParaGoogle(dados, pdfBase64, ranking) {
     .join("\n");
 
   const payload = {
-    nome: dados.nome,
-    email: dados.email,
-    telefone: dados.telefone || "",
-    instagram: dados.instagram || "",
-    motivador: dados.motivador,
+    cadastro: {
+      nome: dados.nome,
+      email: dados.email,
+      whatsapp: dados.whatsapp || "",
+      instagram: dados.instagram || "",
+      faturamento: dados.faturamento || "",
+    },
+    motivadorDominante: dados.motivador,
     rankingTexto,
     ranking,
     segmentos: dados.segmentos_sim,
-    pdfBase64: pdfBase64.split(",")[1] // remove o prefixo data:application/pdf;base64,
+    pdfBase64: pdfBase64 ? pdfBase64.split(",")[1] : ""
   };
 
-  const response = await fetch(GOOGLE_SCRIPT_URL, {
+  // Google Apps Script não suporta CORS — enviamos via no-cors e confiamos na execução
+  await fetch(GOOGLE_SCRIPT_URL, {
     method: "POST",
     mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "text/plain" },
     body: JSON.stringify(payload)
   });
-
-  return response;
 }
 
 // ─────────────────────────────────────────
